@@ -1,9 +1,9 @@
 OGX.Math = {};
-OGX.Math.rotate = function(vec, ang){
-    ang = -ang * (Math.PI/180);
-    const cos = Math.cos(ang);
-    const sin = Math.sin(ang);
-    return [Math.round(10000*(vec[0] * cos - vec[1] * sin))/10000, Math.round(10000*(vec[0] * sin + vec[1] * cos))/10000];
+OGX.Math.rotate = function(__vec, __ang){
+    __ang = -__ang * (Math.PI/180);
+    const cos = Math.cos(__ang);
+    const sin = Math.sin(__ang);
+    return [Math.round(10000*(__vec[0] * cos - __vec[1] * sin))/10000, Math.round(10000*(__vec[0] * sin + __vec[1] * cos))/10000];
 };
 OGX.Math.dist = function(__ptA, __ptB){
     return Math.sqrt((__ptA.x - __ptB.x) ** 2 + (__ptA.x - __ptB.y) ** 2);
