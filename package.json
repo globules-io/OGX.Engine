@@ -1,0 +1,22 @@
+{
+     "name": "@globules-io/ogx.js",
+     "version": "2.0.0",
+     "description": "OGX.JS Framework Engine",
+     "main": "",
+     "repository": {
+          "type": "git",
+          "url": "git+https://github.com/globules-io/OGX.Engine.git"
+     },
+     "keywords": [
+          "ogx",
+          "framework",
+          "engine"
+     ],
+     "types": "ogx.d.ts",
+     "author": "globules.io",
+     "license": "Apache-2.0",
+     "bugs": {
+          "url": "https://github.com/globules-io/OGX.Engine/issues"
+     },
+     "homepage": "https://github.com/globules-io/OGX.Engine#readme"
+}
