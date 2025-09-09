@@ -53,7 +53,6 @@ OGX.Object = class {
      }
 
      #assemble(__cls, __config, __parents) {
-          console.log('assemble', __cls, __parents, __config);
           const instances = __parents.map((Parent) => {
                return new OGX[Parent](__config);
           });
