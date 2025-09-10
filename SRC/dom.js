@@ -37,12 +37,12 @@ OGX.DOM = class{
      uxi(__id){
           const el = document.createElement('div');
           el.classList.add('ogx_uxi');
-          el.addAttribute('data-ogx-id', __id);
+          el.setAttribute('data-ogx-id', __id);
           return el;
      }
 
-     trigger(__sel, __event, __data){
-          const el = document.querySelector(__sel);
+     trigger(__sel, __event, __data={}){   
+          const el = this.el(__sel);
           if(el){
                const customEvent = new CustomEvent(__event, __data);
                el.dispatchEvent(customEvent);
