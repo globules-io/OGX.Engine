@@ -1,12 +1,30 @@
 OGX.OSE = class {
      #filters = {
-          uppercase: (str) => String(str).toUpperCase(),
-          lowercase: (str) => String(str).toLowerCase(),
-          trim: (str) => String(str).trim(),
-          capitalize: (str) => String(str).charAt(0).toUpperCase() + str.slice(1),
-          currency: (val, symbol = '$') => `${symbol}${parseFloat(val).toFixed(2)}`,
-          add: (val, n) => Number(val) + Number(n),
-          formatDate: (date, format = 'YYYY-MM-DD') => new Date(date).toISOString().slice(0, 10),
+          uppercase: (__str) => String(__str).toUpperCase(),
+          lowercase: (__str) => String(__str).toLowerCase(),
+          trim: (__str) => String(__str).trim(),
+          capitalize: (str) => String(__str).charAt(0).toUpperCase() + __str.slice(1),
+          currency: (__val, __symbol = '$') => `${__symbol}${parseFloat(__val).toFixed(2)}`,
+          add: (__val, __n) => Number(__val) + Number(__n),
+          formatDate: (__date, __format = 'YYYY-MM-DD') => new Date(__date).toISOString().slice(0, 10),
+          round: (__val) => Math.round(Number(__val)),
+          floor: (__val) => Math.floor(Number(__val)),
+          ceil: (__val) => Math.ceil(Number(__val)),
+          default: (__val, __fallback) => __val ?? __fallback,
+          length: (__val) => (Array.isArray(__val) || typeof __val === 'string' ? __val.length : 0),
+          json: (__val) => JSON.stringify(__val),
+          slice: (__val, __start, __end) => (typeof __val === 'string' || Array.isArray(__val) ? __val.slice(__start, __end) : __val),
+          replace: (__str, __search, __replace) => String(__str).replace(__search, __replace),
+          join: (__arr, __delimiter = ',') => (Array.isArray(__arr) ? __arr.join(__delimiter) : __arr),
+          split: (__str, __delimiter = ',') => String(__str).split(__delimiter),
+          reverse: (__val) => (Array.isArray(__val) ? [...__val].reverse() : String(__val).split('').reverse().join('')),
+          includes: (__val, __needle) => (Array.isArray(__val) || typeof __val === 'string' ? __val.includes(__needle) : false),
+          startsWith: (__str, __prefix) => String(__str).startsWith(__prefix),
+          endsWith: (__str, __suffix) => String(__str).endsWith(__suffix),
+          highlightMatch: (__text, __query) => {
+               const regex = new RegExp(__query, 'gi');
+               return String(__text).replace(regex, (__match) => `<mark>${__match}</mark>`);
+          },
      };
 
      get(__id) {
@@ -377,7 +395,7 @@ OGX.OSE = class {
                                    const [, methodName, , argStr] = methodMatch;
                                    const method = target?.[methodName];
                                    if (typeof method !== 'function') return `<!-- Method ${methodName} not found -->`;
-                                   const args = argStr ? argStr.split(',').map((arg) => this.#resolveValue(arg.trim(), __context, tempVars)) : [];
+                                   const args = argStr ? argStr.split(',').map((__arg) => this.#resolveValue(__arg.trim(), __context, tempVars)) : [];
                                    target = method.apply(target, args);
                               }
                               const filtered = __node.filters ? this.#applyFilters(target, __node.filters, this.#filters ?? {}) : target;
