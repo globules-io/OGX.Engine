@@ -137,70 +137,47 @@ OGX.Workers = class {
      }
 
      #startAging() {
-    this.#agingInterval = setInterval(() => {
-      const __now = Date.now();
-      for (const __task of this.#queue) {
-        const __age = __now - __task.__timestamp;
-        if (__age > 5000) { // every 5s, bump priority
-          __task.__priority += 1;
-          __task.__timestamp = __now;
-        }
-      }
-      this.#sortQueue();
-    }, 5000);
-  }
+          this.#agingInterval = setInterval(() => {
+               const __now = Date.now();
+               for (const __task of this.#queue) {
+               const __age = __now - __task.__timestamp;
+               if (__age > 5000) { // every 5s, bump priority
+                    __task.__priority += 1;
+                    __task.__timestamp = __now;
+               }
+               }
+               this.#sortQueue();
+          }, 5000);
+     }
 
-  #sortQueue() {
-    this.#queue.sort((__a, __b) => __b.__priority - __a.__priority);
-  }
-
-  #dispatch() {
-    while (this.#active < this.#maxConcurrency && this.#queue.length > 0) {
-      const {
-        __taskFn,
-        __params,
-        __callback,
-        __scripts,
-        __taskId
-      } = this.#queue.shift();
-
-      const __worker = this.#createWorker(__taskFn, __scripts);
-      if (!__worker) continue;
-
-      this.#active++;
-      const __slot = this.#pool.findIndex(__w => __w === null);
-      if (__slot !== -1) this.#pool[__slot] = __worker;
-
-      __worker.onmessage = (__e) => {
-        __callback?.(__e.data);
-        __worker.terminate();
-        if (__slot !== -1) this.#pool[__slot] = null;
-        this.#active--;
-        this.#dispatch();
-      };
-
-      __worker.postMessage(__params);
-    }
-  }
+     #sortQueue() {
+          this.#queue.sort((__a, __b) => __b.__priority - __a.__priority);
+     }
 
      #dispatch() {
           while (this.#active < this.#maxConcurrency && this.#queue.length > 0) {
-               const { __taskFn, __params, __callback, __scripts } = this.#queue.shift();
+               const {
+                    __taskFn,
+                    __params,
+                    __callback,
+                    __scripts,
+                    __taskId
+               } = this.#queue.shift();
                const __worker = this.#createWorker(__taskFn, __scripts);
                if (!__worker) continue;
                this.#active++;
-               const __slot = this.#pool.findIndex((__w) => __w === null);
+               const __slot = this.#pool.findIndex(__w => __w === null);
                if (__slot !== -1) this.#pool[__slot] = __worker;
                __worker.onmessage = (__e) => {
-                    __callback?.(__e.data);
-                    __worker.terminate();
-                    if (__slot !== -1) this.#pool[__slot] = null;
-                    this.#active--;
-                    this.#dispatch();
+               __callback?.(__e.data);
+               __worker.terminate();
+               if (__slot !== -1) this.#pool[__slot] = null;
+               this.#active--;
+               this.#dispatch();
                };
                __worker.postMessage(__params);
           }
-     }
+     }     
 
      #createWorker(__fn, __scripts = [], __interval = false, __intervalParams = null) {
           try {
