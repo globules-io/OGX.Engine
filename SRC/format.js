@@ -65,7 +65,7 @@ OGX.Format = {
                .normalize('NFD')
                .replace(/[\u0300-\u036f]/g, ''),
 
-     localizeDate: (__date, __locale = 'en-US', __options = {}) => {
+     localizeDate: (__date, __locale = 'en-US', __options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) => {
           try {
                return new Date(date).toLocaleDateString(__locale, __options);
           } catch {

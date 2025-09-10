@@ -175,25 +175,7 @@ OGX.Data = class {
                }
           }
           cycle(__obj);
-     }
-
-     pad(__num, __length, __direction, __char) {
-          typeof __char === 'undefined' ? (__char = '0') : null;
-          typeof __direction === 'undefined' ? (__direction = -1) : null;
-          let n = String(__num);
-          while (n.length < __length) {
-               if (__direction === -1) {
-                    n = __char + n;
-               } else {
-                    n = n + __char;
-               }
-          }
-          return n;
-     }
-
-     dec(__num) {
-          return parseFloat(Math.round(__num * 100) / 100).toFixed(2);
-     }
+     }     
 
      isInt(__n) {
           return Number(__n) === __n && __n % 1 === 0;
@@ -231,18 +213,7 @@ OGX.Data = class {
                }
           }
           return __dimension;
-     }
-
-     dateToLocale(__date, __options) {
-          if (typeof __date === 'string') {
-               __date = new Date(__date + ' ');
-          }
-          if (typeof __options === 'undefined') {
-               __options = {};
-          }
-          this.merge(__options, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-          return __date.toLocaleDateString(navigator.language, __options);
-     }
+     }     
 
      clipboard(__text) {
           if (typeof __text !== 'undefined') {
