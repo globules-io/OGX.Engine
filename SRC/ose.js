@@ -21,10 +21,19 @@ OGX.OSE = class {
           includes: (__val, __needle) => (Array.isArray(__val) || typeof __val === 'string' ? __val.includes(__needle) : false),
           startsWith: (__str, __prefix) => String(__str).startsWith(__prefix),
           endsWith: (__str, __suffix) => String(__str).endsWith(__suffix),
-          highlightMatch: (__text, __query) => {
-               const regex = new RegExp(__query, 'gi');
-               return String(__text).replace(regex, (__match) => `<mark>${__match}</mark>`);
+          truncate: (__str, __length = 100, __suffix = '...') => {
+               __str = String(__str);
+               return __str.length > length ? __str.slice(0, __length) + __suffix : __str;
           },
+          pad: (__str, __length = 10, __char = ' ') => {
+               __str = String(__str);
+               return __str.length >= __length ? __str : __str + __char.repeat(__length - __str.length);
+          },
+          highlightMatch: (__text, __query) => {
+               if (!__query) return __text;
+               const regex = new RegExp(__query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+               return String(__text).replace(regex, (__match) => `<mark>${__match}</mark>`);
+          }
      };
 
      get(__id) {
