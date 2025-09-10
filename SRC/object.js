@@ -9,7 +9,7 @@ OGX.Object = class {
      }
 
      getExtend(__cls) {
-          let reg = this.#register.get({ main: { eq: __cls } }, null, 1);
+          let reg = this.#register.get({ main: { eq: __cls } }, 1);
           if (reg) {
                return reg.extends;
           }
@@ -18,7 +18,7 @@ OGX.Object = class {
 
      getExtends(__cls) {
           let arr = [];
-          let reg = this.#register.get({ main: { eq: __cls } }, null, 1);
+          let reg = this.#register.get({ main: { eq: __cls } }, 1);
           if (reg) {
                arr = arr.concat(reg.extends);
                let r;
@@ -57,7 +57,7 @@ OGX.Object = class {
                return new OGX[Parent](__config);
           });
           const instance = new OGX[__cls](__config);
-          instance._NAME_ = cls;
+          instance._NAME_ = __cls;
           return new Proxy(instance, {
                get(target, prop) {
                     if (prop in target) {
