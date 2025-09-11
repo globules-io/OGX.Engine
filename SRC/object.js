@@ -14,7 +14,7 @@ OGX.Object = class {
 
      genId() {
           return 'u' + new Date().getTime() + '' + Math.round(Math.random() * 1000);
-     }  
+     }
 
      getExtend(__cls) {
           let reg = this.#register.get({ main: { eq: __cls } }, 1);
@@ -53,8 +53,8 @@ OGX.Object = class {
      }
 
      create(__cls, __config) {
-          const ext = this.getExtends(__cls);         
-          return this.#assemble(__cls, __config, ext);        
+          const ext = this.getExtends(__cls);
+          return this.#assemble(__cls, __config, ext);
      }
 
      cache(__instance) {
@@ -65,11 +65,11 @@ OGX.Object = class {
      }
 
      uncache(__instance) {
-          this.#uxis.delete({id: __instance.id});
+          this.#uxis.delete({ id: __instance.id });
      }
 
      get(__query, __sort, __limit) {
-          return this.#uxis.get(__query, {sort: __sort, limit: __limit});
+          return this.#uxis.get(__query, { sort: __sort, limit: __limit });
      }
 
      destroy(__uxi, __clear) {
@@ -92,49 +92,103 @@ OGX.Object = class {
                __uxi.el.remove();
           }
           if (__uxi.parent) {
-               __uxi.parent.nodes.delete({id: __uxi.id}, 1);
+               __uxi.parent.nodes.delete({ id: __uxi.id }, 1);
           }
-          this.#uxis.delete({id: __uxi.id}, 1);
-     }        
+          this.#uxis.delete({ id: __uxi.id }, 1);
+     }
 
-     #assemble(__cls, __config, __parents=[]) {
-          console.log('ASSEMBLE', [__cls, ...__parents]);
-          const ref = this.#pathToReference(__cls);  
-          const instance = new ref(__config);          
-          if(!__parents.length){
-               this.#pathToComposite(__cls, instance);  
-               if(typeof instance.placeholders !== 'undefined'){
+     #assemble(__cls, __config, __parents = []) {
+          //console.log('ASSEMBLE', [__cls, ...__parents]);
+          const self = this;
+          const ref = this.#pathToReference(__cls);
+          const instance = new ref(__config);
+          if (!__parents.length) {
+               this.#pathToComposite(__cls, instance);
+               if (typeof instance.placeholders === 'function') {
                     instance.placeholders.call(instance);
-               }    
+               }
                return instance;
-          }      
-          const instances = __parents.map((Parent) => {               
-               return new OGX[Parent](__config);
-          }); 
-          const proxy = new Proxy(instance, {
-               get(target, prop) {
-                    if (prop in target) {
-                         return typeof target[prop] === 'function' ? target[prop].bind(target) : target[prop];
+          }
+          const instances = __parents.map((Parent) => new OGX[Parent](__config));
+          // Merge mixin properties into main instance
+          for (const mixin of instances) {
+               const descriptors = Object.getOwnPropertyDescriptors(mixin);
+               for (const key in descriptors) {
+                    if (!(key in instance)) {
+                         Object.defineProperty(instance, key, descriptors[key]);
                     }
-                    for (const instance of instances) {
-                         if (prop in instance) {
-                              return typeof instance[prop] === 'function' ? instance[prop].bind(instance) : instance[prop];
+               }
+          }
+          const proxy = new Proxy(instance, {
+               get(target, prop, receiver) {
+                    if (Reflect.has(target, prop)) {
+                         const value = Reflect.get(target, prop);
+                         return typeof value === 'function' ? value.bind(receiver) : value;
+                    }
+
+                    for (const mixin of instances) {
+                         if (Reflect.has(mixin, prop)) {
+                              const value = Reflect.get(mixin, prop);
+                              return typeof value === 'function' ? value.bind(receiver) : value;
                          }
                     }
-                    return target[prop];
+                    return undefined;
+               },
+               set(target, prop, value) {
+                    const mixinProps = self.#mixinAggregate(instances);
+                    // Route all assignments to target unless it's a mixin-defined property
+                    if (prop in target || !mixinProps.has(prop)) {
+                         Reflect.set(target, prop, value);
+                         return true;
+                    }
+                    for (const mixin of instances) {
+                         if (prop in mixin) {
+                              mixin[prop] = value;
+                              return true;
+                         }
+                    }
+                    Reflect.set(target, prop, value);
+                    return true;
                },
           });
-          this.#pathToComposite(__cls, proxy);  
-          if(typeof proxy.constructed !== 'undefined'){
-               proxy.constructed.call(proxy);
+          // Rebind mixin methods to proxy
+          for (const mixin of instances) {
+               const proto = Object.getPrototypeOf(mixin);
+               for (const key of Object.getOwnPropertyNames(proto)) {
+                    if (typeof mixin[key] === 'function') {
+                         mixin[key] = mixin[key].bind(proxy);
+                    }
+               }
           }
-          if(typeof proxy.placeholders !== 'undefined'){
-               proxy.placeholders.call(proxy);
+          // Rebind main instance methods to proxy
+          const methodNames = Object.getOwnPropertyNames(Object.getPrototypeOf(instance));
+          for (const key of methodNames) {
+               if (typeof instance[key] === 'function') {
+                    proxy[key] = instance[key].bind(proxy);
+               }
           }
+          this.#pathToComposite(__cls, proxy);
+          if (typeof instance.construct === 'function') {
+               instance.construct.call(proxy);
+          }
+          if (typeof instance.placeholders === 'function') {
+               instance.placeholders.call(proxy);
+          }
+          proxy._target = instance;
           return proxy;
      }
 
-     #pathToReference(__cls){
+     #mixinAggregate(instances) {
+          const props = new Set();
+          for (const mixin of instances) {
+               for (const key of Object.keys(mixin)) {
+                    props.add(key);
+               }
+          }
+          return props;
+     }
+
+     #pathToReference(__cls) {
           let cls = __cls.split('.');
           let ref = OGX;
           for (const part of cls) {
@@ -142,19 +196,19 @@ OGX.Object = class {
           }
           return ref;
      }
-     
-     #pathToComposite(__path, __instance){
-          if(__path.indexOf('.') === -1){
-               __instance._NAME_ = '';               
+
+     #pathToComposite(__path, __instance) {
+          if (__path.indexOf('.') === -1) {
+               __instance._NAME_ = '';
                __instance._NAMESPACE_ = '';
                __instance._CLASS_ = __path;
-          }else{
+          } else {
                let p = __path.split('.');
-               __instance._NAME_ = p[1];               
+               __instance._NAME_ = p[1];
                __instance._NAMESPACE_ = p[0];
                __instance._CLASS_ = p[0].slice(0, -1);
           }
-     }     
+     }
 };
 OGX.Object = new OGX.Object();
 
