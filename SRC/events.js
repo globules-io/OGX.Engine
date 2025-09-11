@@ -1,14 +1,14 @@
 OGX.Events = class {
 
      #events = new OGX.List();
+     #windowEvents = ['resize', 'scroll', 'popstate', 'hashchange', 'orientationchange', 'online', 'offline', 'message', 'beforeunload', 'unload', 'error', 'storage', 'focus', 'blur'];
 
      constructor() {
          this.#listenWindow();
      }
 
-     on(__event, __selector=null, __cb=()=>{}) {   
+     on(__event, __selector=false, __cb=()=>{}) {   
           arguments.length === 2 ? [__cb, __selector] = [__selector, false] : null;
-          console.log(__event, __selector, __cb);
           let item = null;
           if ((item = this.#events.get({ event: __event }, 1))) {
                item.cbs.push({ sel: __selector, cb: __cb });
@@ -19,8 +19,7 @@ OGX.Events = class {
           this.#events.insert(item);
      }
 
-     off(__target, __event, __selector) {
-          arguments.length === 2 ? [__cb, __selector] = [__selector, false] : null;
+     off(__event, __selector=false) {
           const item = this.#events.get({ event: __event }, 1);
           if (item) {
                item.cbs.delete({ sel: __selector }, 1);
@@ -46,9 +45,8 @@ OGX.Events = class {
           }
      }
 
-     #listenWindow(){
-          const windowEvents = ['resize', 'scroll', 'popstate', 'hashchange', 'orientationchange', 'online', 'offline', 'message', 'beforeunload', 'unload', 'error', 'storage', 'focus', 'blur'];
-          windowEvents.forEach((__event) => {
+     #listenWindow(){         
+          this.#windowEvents.forEach((__event) => {
                window.addEventListener(__event, (__e) => {                    
                     if (__e.__redispatched) return;
                     const clonedEvent = new CustomEvent(__event, {
