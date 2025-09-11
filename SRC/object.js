@@ -53,10 +53,15 @@ OGX.Object = class {
      }
 
      #assemble(__cls, __config, __parents) {
-          const instances = __parents.map((Parent) => {
+          const instances = __parents.map((Parent) => {               
                return new OGX[Parent](__config);
           });
-          const instance = new OGX[__cls](__config);
+          __cls = __cls.split('.');
+          let ref = OGX;
+          for (const part of __cls) {
+               ref = ref[part];
+          }
+          const instance = new ref(__config);
           instance._NAME_ = __cls;
           return new Proxy(instance, {
                get(target, prop) {
@@ -68,7 +73,6 @@ OGX.Object = class {
                               return typeof instance[prop] === 'function' ? instance[prop].bind(instance) : instance[prop];
                          }
                     }
-
                     return target[prop];
                },
           });
