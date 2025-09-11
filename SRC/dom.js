@@ -4,14 +4,15 @@ OGX.DOM = class{
           document.addEventListener('DOMContentLoaded', __cb);
      }
 
-     el(__sel){
+     el(__el, __sel){
+          arguments.length === 1 ? [__sel, __el] = [__el, document] : null;
           if(__sel instanceof HTMLDocument){
                return __sel;
           }
           if(__sel instanceof HTMLElement){
                return __sel;
           }
-          const el = document.querySelector(__sel);
+          const el = __el.querySelector(__sel);
           if(el){
                return el;
           }
