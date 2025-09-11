@@ -45,25 +45,21 @@ OGX.Object = class {
      }
 
      create(__cls, __config) {
-          const ext = this.getExtends(__cls);
-          if (ext.length) {
-               return this.#assemble(__cls, __config, ext);
-          }
-          return new OGX[__cls](__config);
+          const ext = this.getExtends(__cls);         
+          return this.#assemble(__cls, __config, ext);        
      }
 
-     #assemble(__cls, __config, __parents) {
+     #assemble(__cls, __config, __parents=[]) {
+          const ref = this.#pathToReference(__cls);          
+          const instance = new ref(__config);          
+          if(!__parents.length){
+               this.#pathToComposite(__cls, instance);  
+               return instance;
+          }      
           const instances = __parents.map((Parent) => {               
                return new OGX[Parent](__config);
-          });
-          __cls = __cls.split('.');
-          let ref = OGX;
-          for (const part of __cls) {
-               ref = ref[part];
-          }
-          const instance = new ref(__config);
-          instance._NAME_ = __cls;
-          return new Proxy(instance, {
+          }); 
+          const proxy = new Proxy(instance, {
                get(target, prop) {
                     if (prop in target) {
                          return typeof target[prop] === 'function' ? target[prop].bind(target) : target[prop];
@@ -76,6 +72,30 @@ OGX.Object = class {
                     return target[prop];
                },
           });
+          this.#pathToComposite(__cls, instance);  
+          return proxy;
+     }
+
+     #pathToReference(__cls){
+          let cls = __cls.split('.');
+          let ref = OGX;
+          for (const part of cls) {
+               ref = ref[part];
+          }
+          return ref;
+     }
+     
+     #pathToComposite(__path, __instance){
+          if(__path.indexOf('.') === -1){
+               __instance._NAME_ = '';               
+               __instance._NAMESPACE_ = '';
+               __instance._CLASS_ = __path;
+          }else{
+               let p = __path.split('.');
+               __instance._NAME_ = p[1];               
+               __instance._NAMESPACE_ = p[0];
+               __instance._CLASS_ = p[0].slice(0, -1);
+          }
      }
 
      cache(__instance) {
