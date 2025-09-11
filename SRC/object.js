@@ -49,6 +49,50 @@ OGX.Object = class {
           return this.#assemble(__cls, __config, ext);        
      }
 
+     cache(__instance) {
+          if (typeof __instance === 'undefined') {
+               return uxis;
+          }
+          this.#uxis.insert(__instance);
+     }
+
+     uncache(__instance) {
+          this.#uxis.findDelete('id', __instance.id);
+     }
+
+     get(__query, __sort, __limit) {
+          return this.#uxis.get(__query, __sort, __limit);
+     }
+
+     destroy(__uxi, __clear) {
+          if (typeof __clear === 'undefined') {
+               __clear = true;
+          }
+          if (typeof __uxi.blur === 'function') {
+               __uxi.blur();
+          }
+          if (typeof __uxi.destroy === 'function') {
+               __uxi.destroy();
+          }
+          if (typeof __uxi.__destroy === 'function') {
+               __uxi.__destroy();
+          }
+          if (__clear) {
+               __uxi.clear();
+          }
+          if (__uxi.el) {
+               __uxi.el.remove();
+          }
+          if (__uxi.parent) {
+               __uxi.parent.nodes.findDelete('id', __uxi.id, 1);
+          }
+          this.#uxis.findDelete('id', __uxi.id, 1);
+     }
+
+     genId() {
+          return 'u' + new Date().getTime() + '' + Math.round(Math.random() * 1000);
+     }     
+
      #assemble(__cls, __config, __parents=[]) {
           const ref = this.#pathToReference(__cls);          
           const instance = new ref(__config);          
@@ -96,62 +140,7 @@ OGX.Object = class {
                __instance._NAMESPACE_ = p[0];
                __instance._CLASS_ = p[0].slice(0, -1);
           }
-     }
-
-     cache(__instance) {
-          if (typeof __instance === 'undefined') {
-               return uxis;
-          }
-          this.#uxis.insert(__instance);
-     }
-
-     uncache(__instance) {
-          this.#uxis.findDelete('id', __instance.id);
-     }
-
-     get(__query, __sort, __limit) {
-          return this.#uxis.get(__query, __sort, __limit);
-     }
-
-     destroy(__uxi, __clear) {
-          if (typeof __clear === 'undefined') {
-               __clear = true;
-          }
-          if (typeof __uxi.blur === 'function') {
-               __uxi.blur();
-          }
-          if (typeof __uxi.destroy === 'function') {
-               __uxi.destroy();
-          }
-          if (typeof __uxi.__destroy === 'function') {
-               __uxi.__destroy();
-          }
-          if (__clear) {
-               __uxi.clear();
-          }
-          if (__uxi.el) {
-               __uxi.el.remove();
-          }
-          if (__uxi.parent) {
-               __uxi.parent.nodes.findDelete('id', __uxi.id, 1);
-          }
-          this.#uxis.findDelete('id', __uxi.id, 1);
-     }
-
-     genId() {
-          return 'u' + new Date().getTime() + '' + Math.round(Math.random() * 1000);
-     }
-
-     pathToObj(__string) {
-          let path = __string.split('.');
-          let o = OGX;
-          for (let i = 0; i < path.length; i++) {
-               if (typeof o[path[i]] !== 'undefined') {
-                    o = o[path[i]];
-               }
-          }
-          return o;
-     }
+     }     
 };
 OGX.Object = new OGX.Object();
 
