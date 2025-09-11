@@ -201,19 +201,33 @@ OGX.DOM = class{
           return null;
      } 
 
-     append(__sel, __html){
+     append(__sel, __html){          
           const el = this.el(__sel);
           if(el){
-               el.insertAdjacentHTML('beforeend', __html);
+               if(typeof __html === 'string'){
+                    el.insertAdjacentHTML('beforeend', __html);
+                    return this;
+               }
+               if(__html instanceof HTMLElement){
+                    el.append(__html);
+                    return this;
+               }
                return this;
           }
           return null;
      }
 
-     prepend(__sel, __hmtl){
+     prepend(__sel, __html){
           const el = this.el(__sel);
           if(el){
-               el.insertAdjacentHTML('afterbegin', __html);
+               if(typeof __html === 'string'){
+                    el.insertAdjacentHTML('afterbegin', __html);
+                    return this;
+               }
+               if(__html instanceof HTMLElement){
+                    el.append(__html);
+                    return this;
+               }              
                return this;
           }
           return null;
