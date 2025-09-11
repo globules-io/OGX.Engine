@@ -1,3 +1,7 @@
+OGX.Stages = {};
+OGX.Controllers = {};
+OGX.Views = {};
+OGX.Components = {};
 OGX.Object = class {
      #register;
      #uxis;
@@ -94,7 +98,7 @@ OGX.Object = class {
      }        
 
      #assemble(__cls, __config, __parents=[]) {
-          const ref = this.#pathToReference(__cls);          
+          const ref = this.#pathToReference(__cls);  
           const instance = new ref(__config);          
           if(!__parents.length){
                this.#pathToComposite(__cls, instance);  
@@ -116,7 +120,8 @@ OGX.Object = class {
                     return target[prop];
                },
           });
-          this.#pathToComposite(__cls, instance);  
+          this.#pathToComposite(__cls, proxy);  
+          instance.constructed.call(proxy);
           return proxy;
      }
 
