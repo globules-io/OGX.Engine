@@ -3,7 +3,11 @@ OGX.Scope = class {
 
      scope = 'public';
      #token = false;
-     #jwt = __jwt;
+     #jwt = false;
+
+     constructor(__jwt){
+          this.#jwt = __jwt;
+     }
 
      scope(__string) {
           if (typeof __string === 'undefined') {
@@ -35,7 +39,7 @@ OGX.Scope = class {
      }
 
      eval(__exp, __scope) {
-          typeof __scope === 'undefined' ? (__scope = scope) : null;
+          typeof __scope === 'undefined' ? (__scope = this.scope) : null;
           if (Array.isArray(__exp)) {
                __exp = __exp.join(' ');
           }
