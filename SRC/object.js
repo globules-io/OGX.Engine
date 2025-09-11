@@ -5,8 +5,12 @@ OGX.Object = class {
      constructor() {
           this.#register = new OGX.List();
           this.#uxis = new OGX.List();
-          this.#uxis.cache('_NAME_', 'id');
+          this.#uxis.cache('_CLASS_', 'id');
      }
+
+     genId() {
+          return 'u' + new Date().getTime() + '' + Math.round(Math.random() * 1000);
+     }  
 
      getExtend(__cls) {
           let reg = this.#register.get({ main: { eq: __cls } }, 1);
@@ -57,11 +61,11 @@ OGX.Object = class {
      }
 
      uncache(__instance) {
-          this.#uxis.findDelete('id', __instance.id);
+          this.#uxis.delete({id: __instance.id});
      }
 
      get(__query, __sort, __limit) {
-          return this.#uxis.get(__query, __sort, __limit);
+          return this.#uxis.get(__query, {sort: __sort, limit: __limit});
      }
 
      destroy(__uxi, __clear) {
@@ -84,14 +88,10 @@ OGX.Object = class {
                __uxi.el.remove();
           }
           if (__uxi.parent) {
-               __uxi.parent.nodes.findDelete('id', __uxi.id, 1);
+               __uxi.parent.nodes.delete({id: __uxi.id}, 1);
           }
-          this.#uxis.findDelete('id', __uxi.id, 1);
-     }
-
-     genId() {
-          return 'u' + new Date().getTime() + '' + Math.round(Math.random() * 1000);
-     }     
+          this.#uxis.delete({id: __uxi.id}, 1);
+     }        
 
      #assemble(__cls, __config, __parents=[]) {
           const ref = this.#pathToReference(__cls);          
