@@ -15,7 +15,7 @@ OGX.Touch = class {
                args.push(this.selector+' '+__target);
           } 
           args.push(__callback);                
-          OGX.EventManager.on(...args);          
+          OGX.Events.on(...args);          
      } 
 
      off(__event, __target){         
@@ -25,7 +25,7 @@ OGX.Touch = class {
           }else{
                args.push(this.selector+' '+__target);
           } 
-          OGX.EventManager.off(...args);         
+          OGX.Events.off(...args);         
      }      
 };
 
