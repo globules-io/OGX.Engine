@@ -98,10 +98,14 @@ OGX.Object = class {
      }        
 
      #assemble(__cls, __config, __parents=[]) {
+          console.log('ASSEMBLE', [__cls, ...__parents]);
           const ref = this.#pathToReference(__cls);  
           const instance = new ref(__config);          
           if(!__parents.length){
                this.#pathToComposite(__cls, instance);  
+               if(typeof instance.placeholders !== 'undefined'){
+                    instance.placeholders.call(instance);
+               }    
                return instance;
           }      
           const instances = __parents.map((Parent) => {               
@@ -121,7 +125,12 @@ OGX.Object = class {
                },
           });
           this.#pathToComposite(__cls, proxy);  
-          instance.constructed.call(proxy);
+          if(typeof proxy.constructed !== 'undefined'){
+               proxy.constructed.call(proxy);
+          }
+          if(typeof proxy.placeholders !== 'undefined'){
+               proxy.placeholders.call(proxy);
+          }
           return proxy;
      }
 
