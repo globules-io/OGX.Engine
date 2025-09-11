@@ -11,7 +11,7 @@ OGX.Data = class {
                base = this.clone(__a);
           }
           for (let a in __b) {
-               if (!base.hasOwnProperty(a) && !__options.strict) {
+               if (!base.hasOwnProperty(a) && __options.strict) {
                     continue;
                }
                if (base.hasOwnProperty(a) && !__options.overwrite) {
