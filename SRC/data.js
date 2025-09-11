@@ -1,6 +1,6 @@
 OGX.Data = class {
      merge(__a, __b, __options = {}) {
-          const options_default = { overwrite: true, strict: false, copy: false };
+          const options_default = { overwrite: false, strict: false, copy: false };
           for (let a in options_default) {
                if (!__options.hasOwnProperty(a)) {
                     __options[a] = options_default[a];
@@ -23,7 +23,7 @@ OGX.Data = class {
      }
 
      weld(__a, __b, __options = {}) {
-          const options_default = { overwrite: true, strict: false, copy: false };
+          const options_default = { overwrite: false, strict: false, copy: false };
           this.merge(__options, options_default);
           let main;
           if (__options.copy) {
