@@ -99,7 +99,7 @@ OGX.Scope = class {
                     reg = reg.replace(/^\/\^?/, '');
                     reg = reg.replace(/\$?\/$/, '');
                     reg = new RegExp(reg, 'g');
-                    if (scope.match(reg)) {
+                    if (this.scope.match(reg)) {
                          __exp = __exp.replace(arr[i], '1');
                     } else {
                          __exp = __exp.replace(arr[i], '0');
